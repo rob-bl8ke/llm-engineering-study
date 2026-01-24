@@ -1,0 +1,54 @@
+{
+  "name": "LLM Engineering Study",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+        "python.terminal.activateEnvironment": true,
+        "jupyter.notebookFileRoot": "${workspaceFolder}",
+        "files.watcherExclude": {
+          "**/.git/objects/**": true,
+          "**/.git/subtree-cache/**": true,
+          "**/node_modules/*/**": true,
+          "**/.venv/**": true
+        }
+      },
+      "extensions": [
+        // Python & Jupyter
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        
+        // AI/Copilot
+        "github.copilot",
+        "github.copilot-chat",
+        
+        // Git Tools
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
+        
+        // Utilities
+        "mikestead.dotenv",
+        "gruntfuggly.todo-tree",
+        "pkief.material-icon-theme"
+      ]
+    }
+  },
+  "forwardPorts": [
+    7860  // Gradio default port
+  ],
+  "postCreateCommand": "uv sync",
+  "remoteUser": "vscode",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers-extra/features/uv:1": {}
+  }
+}
