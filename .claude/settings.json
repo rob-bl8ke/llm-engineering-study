@@ -1,0 +1,22 @@
+
+{
+  "permissions": {
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Edit(**/.env)",
+      "Edit(**/.env.*)"
+    ]
+  }
+//   "sandbox": {
+//     "enabled": true,
+//     "failIfUnavailable": true,
+//     "allowUnsandboxedCommands": false,
+//     "filesystem": {
+//       "denyRead": [
+//         "**/.env",
+//         "**/.env.*"
+//       ]
+//     }
+//   }
+}
