@@ -1,0 +1,141 @@
+@startmindmap "Tool Use"
+
+title Claude Tool Use — Key Concepts
+caption From schema definition to tool execution and MCP-sourced tools
+center footer tool-use.txt concept map
+
+<style>
+    mindMapDiagram {
+        LineColor #36536B
+        RoundCorner 5
+        BackgroundColor white
+        Shadowing 2.0
+
+        node {
+            FontColor #1F2D3A
+            LineColor #1F2D3A
+            BackgroundColor #E8F4F8
+            Shadowing 2.0
+            RoundCorner 25
+        }
+        :depth(0) {
+            FontColor #1F2D3A
+            LineColor white
+            BackgroundColor white
+            Shadowing 0.0
+        }
+        :depth(1) {
+            FontColor white
+            BackgroundColor #1F2D3A
+            Shadowing 2.0
+        }
+        :depth(2) {
+            FontColor #1F2D3A
+            LineColor #36536B
+            BackgroundColor #E8F4F8
+            Shadowing 2.0
+            RoundCorner 25
+        }
+        :depth(3) {
+            FontColor #1F2D3A
+            LineColor #36536B
+            BackgroundColor #F5FAFC
+            Shadowing 1.0
+            RoundCorner 15
+        }
+
+        .failure {
+            BackgroundColor #LightPink
+            FontColor #6B1A1A
+            LineColor #C2185B
+        }
+
+        arrow {
+            LineStyle 4
+            LineThickness 0.5
+            LineColor #36536B
+        }
+
+        boxless {
+            FontColor #1F2D3A
+            Margin 10
+            Padding 10
+            MaximumWidth 350
+        }
+    }
+</style>
+
++ Tool Use
+
+++ Tool-Use Loop
++++ Six-step cycle
+++++_ 1 Define schema — name, description, input_schema
+++++_ 2 Send message — tool definitions plus user input
+++++_ 3 **tool_use** — name, unique ID, args; stop_reason: tool_use
+++++_ 4 Execute tool — app runs it; assistant turn already ended
+++++_ 5 Return result — **tool_result** carrying the same ID
+++++_ 6 Claude continues — another tool call or a final turn
++++_ Ownership: Claude selects, app executes; model stateless between calls
++++_ Failure: skipped step 4 breaks the loop; systematic miss means fix schema <<failure>>
+
+++ Message Blocks
++++ Four block types
+++++_ text — Claude prose; preserve the full content array
+++++_ tool_use — assistant call: tool name, unique ID, input args
+++++_ tool_result — user turn: matching ID, content, optional is_error
+++++_ thinking — extended thinking only; pass back unchanged
++++ Pairing invariant
+++++_ Every tool_use needs a tool_result in the immediately following user turn
+++++_ IDs must match; missing or late results fail API validation
+++++_ Structural rule — prompt edits cannot repair it <<failure>>
+
+++ Schema Anatomy
++++_ Name — short and specific (get_account_balance, not get_data)
++++ Description
+++++_ State when to use and when not to use
+++++_ Vague "find information" yields wrong selections <<failure>>
+++++_ Exclusion conditions give Claude a decision rule
++++ input_schema
+++++_ JSON Schema parameters the function accepts
+++++_ required: inputs the call cannot work without
+++++_ optional: defaults; absence can carry meaning
+
+++ Schema Design Choices
++++_ Subtask dependency — sequence dependent calls; parallel independent ones
++++_ Required fields — required array; avoid fabricated values
++++_ Optional fields — defaults in signature; avoid forced guessing
++++_ Description length — 3–4 sentences: what, when, returns; add input examples
++++_ Overlapping parameter types — name the domain or trigger in each description
+
+-- Disambiguation Example
+--- Problem: two similar tools
+----_ search_knowledge_base vs get_cached_result
+----_ Both described as "use this to find information" <<failure>>
+----_ Distinct names alone did not prevent wrong picks
+--- Fix: exclusion conditions
+----_ search_knowledge_base — skip if a prior search covers the question
+----_ get_cached_result — only after a same-query search this session
+---_ Requires complete conversation history in every request
+--- Fit check
+----_ Handles well: specific triggers plus explicit exclusions
+----_ Poor fit: near-identical tools — merge with a type parameter <<failure>>
+
+-- MCP Alternative
+--- What it is: server-owned definitions and execution
+--- Loop unchanged: ListToolsRequest yields tools; same tool_use/result rules
+--- Context cost: unused definitions still consume window budget
+--- Connector controls (mcp_toolset)
+----_ defer_loading — defer definition loading until needed
+----_ enabled — allow or deny specific tools
+----_ Requires mcp-client-2025-11-20 beta header <<failure>>
+--- Transports
+----_ Local stdio subprocess; API connector cannot reach it <<failure>>
+----_ Remote Streamable HTTP; SSE-only deprecated <<failure>>
+
+-- Choosing an Approach
+---_ Use MCP when a maintained server covers the required operations
+---_ Manual schemas when no server fits or precise description control is needed
+---_ Both: MCP breadth plus allowlisting and description tuning
+---_ Two levers — narrow the tool set; sharpen the descriptions
+
+@endmindmap
