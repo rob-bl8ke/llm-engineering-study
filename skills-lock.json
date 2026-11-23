@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "skills": {
+    "plantuml-diagrams": {
+      "source": "rob-bl8ke/agent-skills",
+      "ref": "main",
+      "commit": "33a014676b247e1edf9b398115826d42721f4984",
+      "sourceType": "github",
+      "skillPath": "current/plantuml-diagrams/SKILL.md",
+      "computedHash": "078855ffb359ae9a2db52ebd00b7f1653e19a5020ac037635d33f6ae0ddd072d"
+    }
+  }
+}
